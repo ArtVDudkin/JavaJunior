@@ -31,7 +31,7 @@ public class Task2 {
         stuff.add(new Employee("Sergey Borisov", 50,12000, "Analytic"));
 
         // 2.2 Вывести список всех различных отделов (department) по списку сотрудников
-        System.out.println(stuff.stream().fi;
+        System.out.println(stuff.stream().filt;
     }
 
 }
