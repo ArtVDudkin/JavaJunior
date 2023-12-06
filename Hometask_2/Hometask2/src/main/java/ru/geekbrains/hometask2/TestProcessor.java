@@ -10,9 +10,8 @@ import java.util.List;
 public class TestProcessor {
 
     /**
-     * Данный метод находит все void методы без аргументов в классе, и запускеет их.
-     * <p>
-     * Для запуска создается тестовый объект с помощью конструткора без аргументов.
+     * Данный метод находит все void методы без аргументов в классе, и запускает их.
+     * Для запуска создается тестовый объект с помощью конструктора без аргументов.
      */
     public static void runTest(Class<?> testClass) {
         final Constructor<?> declaredConstructor;
@@ -52,6 +51,7 @@ public class TestProcessor {
                 methods.add(method);
             }
         }
+
         methods.sort(Comparator.comparingInt(m -> m.getAnnotation(TestAnnotation.class).order()));
         methods.forEach(it -> {
             beforeMethods.forEach(bit -> runBefore(bit, testObj));

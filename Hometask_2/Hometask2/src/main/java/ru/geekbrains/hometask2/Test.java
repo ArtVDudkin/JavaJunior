@@ -37,4 +37,10 @@ public class Test {
     public static void beforeEachTestTwo() {
         System.out.println("before each test two запущен");
     }
+
+    @TestAnnotation
+    @DisplayName
+    public static void displayNameTest() {
+        System.out.println("DisplayName test запущен");
+    }
 }
