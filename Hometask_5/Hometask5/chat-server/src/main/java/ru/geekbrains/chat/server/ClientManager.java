@@ -84,17 +84,14 @@ public class ClientManager implements Runnable {
     }
 
     private void sendTo(long id, String message) {
-        System.out.println("-" + id + "-" );
         System.out.println(message);
-
-        clients.values().forEach(System.out::println);
-        System.out.println("--");
-        System.out.println(clients.get(id).toString());
-//        clients.get(2).bufferedWriter.write("2222222");
-//        clients.get(2).bufferedWriter.newLine();
-//        clients.get(2).bufferedWriter.flush();
-//        SocketWrapper destination = clients.get(destinationId);
-//        destination.getOutput().println(msg);
+        try {
+            clients.get(id).bufferedWriter.write(message);
+            clients.get(id).bufferedWriter.newLine();
+            clients.get(id).bufferedWriter.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
