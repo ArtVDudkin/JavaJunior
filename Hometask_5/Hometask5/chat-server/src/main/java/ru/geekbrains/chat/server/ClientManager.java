@@ -44,6 +44,19 @@ public class ClientManager implements Runnable {
                     closeEverything(socket, bufferedReader, bufferedWriter);
                     break;
                 }
+                String[] msg = messageFromClient.split(" ");
+                if(msg[1].charAt(0) == '@') {
+                    try {
+                        // в messageFromClient первым словом указано имя пользователя, а затем само сообщение!
+                        long sendToId = Long.parseLong(msg[1].substring(1));
+                        sendTo(sendToId, messageFromClient);
+                    } catch (NumberFormatException | NullPointerException e) {
+                        // Если после @ не получилось корректно распарсить значение типа long,
+                        // то рассылаем исходное сообщение всем пользователям как есть
+                        broadcastMessage(messageFromClient);
+                    }
+
+                }
                 broadcastMessage(messageFromClient);
             } catch (IOException e) {
                 closeEverything(socket, bufferedReader, bufferedWriter);
@@ -68,6 +81,20 @@ public class ClientManager implements Runnable {
                     }
                 }
                 );
+    }
+
+    private void sendTo(long id, String message) {
+        System.out.println("-" + id + "-" );
+        System.out.println(message);
+
+        clients.values().forEach(System.out::println);
+        System.out.println("--");
+        System.out.println(clients.get(id).toString());
+//        clients.get(2).bufferedWriter.write("2222222");
+//        clients.get(2).bufferedWriter.newLine();
+//        clients.get(2).bufferedWriter.flush();
+//        SocketWrapper destination = clients.get(destinationId);
+//        destination.getOutput().println(msg);
     }
 
     /**
