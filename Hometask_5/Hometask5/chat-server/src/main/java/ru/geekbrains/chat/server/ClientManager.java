@@ -56,8 +56,9 @@ public class ClientManager implements Runnable {
                         broadcastMessage(messageFromClient);
                     }
 
+                } else {
+                    broadcastMessage(messageFromClient);
                 }
-                broadcastMessage(messageFromClient);
             } catch (IOException e) {
                 closeEverything(socket, bufferedReader, bufferedWriter);
                 break;
@@ -84,7 +85,7 @@ public class ClientManager implements Runnable {
     }
 
     private void sendTo(long id, String message) {
-        System.out.println(message);
+        System.out.println(id + ": " + message);
         try {
             clients.get(id).bufferedWriter.write(message);
             clients.get(id).bufferedWriter.newLine();
