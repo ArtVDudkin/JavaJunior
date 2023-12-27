@@ -7,7 +7,6 @@ import java.rmi.UnknownHostException;
 public class Main {
 
     public static final int PORT = 2024;
-    private static long clientCounter = 1L;
 
     public static void main(String[] args) throws IOException {
         try {

@@ -55,9 +55,33 @@ public class Client {
             Scanner scanner = new Scanner(System.in);
             while (socket.isConnected()) {
                 String message = scanner.nextLine();
-                bufferedWriter.write(name + ": " + message);
-                bufferedWriter.newLine();
-                bufferedWriter.flush();
+
+                switch (message) {
+                    case "": {
+                        continue;
+                    }
+                    case "q": {
+                        // Клиент выходит из чата, о чем оповещаются все остальные
+                        System.out.println("Вы покидаете чат. До новых встреч!");
+                        System.exit(0);
+                    }
+                    default: {
+                        bufferedWriter.write(name + ": " + message);
+                        bufferedWriter.newLine();
+                        bufferedWriter.flush();
+                    }
+                }
+//                if(message != "") {
+//                    bufferedWriter.write(name + ": " + message);
+//                    bufferedWriter.newLine();
+//                    bufferedWriter.flush();
+//                }
+//                if (message.equals("q")) {
+//                    System.out.println("its here");
+//                    // Клиент выходит из чата, о чем оповещаются все остальные
+//                    closeEverything(socket, bufferedReader, bufferedWriter);
+//                    System.exit(0);
+//                }
             }
         } catch (IOException e) {
             closeEverything(socket, bufferedReader, bufferedWriter);
