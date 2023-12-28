@@ -12,6 +12,7 @@ public class ClientManager implements Runnable {
     private BufferedWriter bufferedWriter;
     private String name;
     private final long clientId;
+    private boolean isAdmin = false;
 
     private static long clientCounter = 1L;
     private static final Map<Long, ClientManager> clients = new HashMap<>();
@@ -23,9 +24,18 @@ public class ClientManager implements Runnable {
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             name = bufferedReader.readLine();
+            if(name.toLowerCase().equals("admin")) {
+                // ToDo подумать над механизмом авторизации админа
+                this.isAdmin = true;
+                System.out.println("Администратор " + name + " подключился к чату");
+                broadcastMessage("Server: Администратор " + name +"_[@" + clientId + "]" + " подключился к чату");
+            } else {
+                this.isAdmin = false;
+                System.out.println(name + " подключился к чату");
+                broadcastMessage("Server: " + name +"_[@" + clientId + "]" + " подключился к чату");
+            }
             clients.put(clientId, this);
-            System.out.println(name + " подключился к чату");
-            broadcastMessage("Server: " + name +"_[@" + clientId + "]" + " подключился к чату");
+
         } catch (IOException e) {
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
@@ -46,6 +56,7 @@ public class ClientManager implements Runnable {
                 }
                 String[] msg = messageFromClient.split(" ");
                 if(msg[1].charAt(0) == '@') {
+                    // если сообщение начинается с @, то пытаемся обработать его как приватное
                     try {
                         // в messageFromClient первым словом указано имя пользователя, а затем само сообщение!
                         long sendToId = Long.parseLong(msg[1].substring(1));
@@ -54,6 +65,18 @@ public class ClientManager implements Runnable {
                         // Если после @ не получилось корректно распарсить значение типа long,
                         // то рассылаем исходное сообщение всем пользователям как есть
                         broadcastMessage(messageFromClient);
+                    }
+
+                } else if(msg[1].toLowerCase().equals("kick") && isAdmin) {
+                    // если сообщение начинается с kick и это admin, то пытаемся кикнуть пользователя
+                    try {
+                        // в messageFromClient первым словом указано имя пользователя, вторыс слово kick, третьим id
+                        long kickUserId = Long.parseLong(msg[2]);
+                        kickUser(kickUserId);
+                    } catch (NumberFormatException | NullPointerException e) {
+                        // Если после @ не получилось корректно распарсить значение типа long,
+                        // то рассылаем исходное сообщение всем пользователям как есть
+                        sendTo(clientId, "Ошибка формата ввода команды! Правильный формат: kick 4");
                     }
 
                 } else {
@@ -84,8 +107,10 @@ public class ClientManager implements Runnable {
                 );
     }
 
+    /**
+     * Отправить приватное сообщение конкретному пользователю по id
+     */
     private void sendTo(long id, String message) {
-        System.out.println(id + ": " + message);
         try {
             clients.get(id).bufferedWriter.write(message);
             clients.get(id).bufferedWriter.newLine();
@@ -93,6 +118,17 @@ public class ClientManager implements Runnable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Отключить пользователя по id
+     */
+    private void kickUser(long id) {
+        sendTo(id, "Вы забанены администратором за плохое поведение");
+//        clients.get(id).socket.close();
+        broadcastMessage("Пользователь " + clients.get(id).name + " забанен админом за плохое поведение");
+        System.out.println("Пользователь " + clients.get(id).name + " забанен админом за плохое поведение");
+        clients.remove(id);
     }
 
     /**

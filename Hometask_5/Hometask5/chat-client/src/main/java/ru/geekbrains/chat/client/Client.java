@@ -71,17 +71,6 @@ public class Client {
                         bufferedWriter.flush();
                     }
                 }
-//                if(message != "") {
-//                    bufferedWriter.write(name + ": " + message);
-//                    bufferedWriter.newLine();
-//                    bufferedWriter.flush();
-//                }
-//                if (message.equals("q")) {
-//                    System.out.println("its here");
-//                    // Клиент выходит из чата, о чем оповещаются все остальные
-//                    closeEverything(socket, bufferedReader, bufferedWriter);
-//                    System.exit(0);
-//                }
             }
         } catch (IOException e) {
             closeEverything(socket, bufferedReader, bufferedWriter);
