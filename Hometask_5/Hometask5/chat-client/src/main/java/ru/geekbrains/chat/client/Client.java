@@ -34,7 +34,12 @@ public class Client {
                 while (socket.isConnected()) {
                     try {
                         message = bufferedReader.readLine();
-                        System.out.println(message);
+                        if(message != null) {
+                            System.out.println(message);
+                        } else {
+                            System.exit(0);
+                        }
+
                     } catch (IOException e) {
                         closeEverything(socket, bufferedReader, bufferedWriter);
                     }

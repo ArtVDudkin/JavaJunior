@@ -124,11 +124,31 @@ public class ClientManager implements Runnable {
      * Отключить пользователя по id
      */
     private void kickUser(long id) {
-        sendTo(id, "Вы забанены администратором за плохое поведение");
-//        clients.get(id).socket.close();
-        broadcastMessage("Пользователь " + clients.get(id).name + " забанен админом за плохое поведение");
-        System.out.println("Пользователь " + clients.get(id).name + " забанен админом за плохое поведение");
-        clients.remove(id);
+        // отправляем персональное уведомление виновнику
+        sendTo(id, "Вы забанены администратором за плохое поведение!");
+        try {
+            // Закрываем соединение пользователю
+            clients.get(id).socket.close();
+            // оповещаем остальных пользователей, кроме виновника
+            clients.values().forEach(it -> {
+                        try {
+                            if (it.clientId != id) {
+                                it.bufferedWriter.write("Пользователь " + clients.get(id).name + " забанен админом за плохое поведение");
+                                it.bufferedWriter.newLine();
+                                it.bufferedWriter.flush();
+                            }
+                        } catch (IOException e) {
+                            closeEverything(socket, bufferedReader, bufferedWriter);
+                        }
+                    }
+            );
+            System.out.println("Пользователь " + clients.get(id).name + " забанен админом за плохое поведение");
+            clients.remove(id);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
     }
 
     /**
